@@ -8,7 +8,7 @@ app.use(express.json());
 
 // 連接 MySQL 資料庫
 const db = mysql.createConnection({
-  host: '100.81.89.64',
+  host: '127.0.0.1',
   user: 'root',
   password: 'rootroot',
   database: 'myDatabase'
@@ -17,7 +17,7 @@ const db = mysql.createConnection({
 db.connect();
 
 // 提供API資料
-app.post('/api/getGoodsList', (req, res) => {
+app.post('/getGoodsList', (req, res) => {
   const { id } = req.body;
   console.log("id: ", id);
   db.query('SELECT * FROM sp_goods', (err, results) => {
@@ -25,7 +25,7 @@ app.post('/api/getGoodsList', (req, res) => {
     res.json(results);
   });
 });
-app.post('/api/addGood', (req, res) => {
+app.post('/addGood', (req, res) => {
   const { user_name, } = req.body;
   const sql = `INSERT INTO sp_goods (user_name, mail_address, password, created, modified)
     VALUES (?, ?, ?, now(), now());`
@@ -34,7 +34,7 @@ app.post('/api/addGood', (req, res) => {
     res.json(results);
   });
 });
-app.post('/api/updateGood', (req, res) => {
+app.post('/updateGood', (req, res) => {
   const { user_name, goods_id} = req.body;
   const sql = `UPDATE sp_goods SET user_name = ?, mail_address = ? WHERE goods_id = ?;`
   db.query(sql, [user_name, goods_id], (err, results) => {
@@ -42,7 +42,7 @@ app.post('/api/updateGood', (req, res) => {
     res.json(results);
   });
 });
-app.post('/api/deleteGood', (req, res) => {
+app.post('/deleteGood', (req, res) => {
   const { id } = req.body;
   db.query(`DELETE FROM sp_goods WHERE goods_id = ${id};`, (err, results) => {
     if (err) return res.status(500).send(err);
