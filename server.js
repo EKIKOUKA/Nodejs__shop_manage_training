@@ -6,7 +6,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// 連接 MySQL 資料庫
+// MySQL データーベースを連結
 const db = mysql.createConnection({
   host: '127.0.0.1',
   user: 'test',
@@ -16,7 +16,7 @@ const db = mysql.createConnection({
 
 db.connect();
 
-// 提供API資料
+// APIを提供する
 app.post('/login', (req, res) => {
   const {username, password} = req.body;
   const sql = `SELECT * FROM sp_user WHERE user_email = ?;`
