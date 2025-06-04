@@ -9,46 +9,64 @@ app.use(express.json());
 // 連接 MySQL 資料庫
 const db = mysql.createConnection({
   host: '127.0.0.1',
-  user: 'root',
-  password: 'rootroot',
+  user: 'test',
+  password: 'testtest',
   database: 'myDatabase'
 });
 
 db.connect();
 
 // 提供API資料
+app.post('/login', (req, res) => {
+  const {username, password} = req.body;
+  const sql = `SELECT * FROM sp_user WHERE user_email = ?;`
+  db.query(sql, [username], (err, result) => {
+    if (err) {
+      console.log("err: ", err)
+      return res.status(500).json({success: 0, message: "データーヘースー調べが失敗した"});
+    }
+
+    if (result[0] && result[0].password == password) {
+      return res.json({
+        success: 1,
+        userInfo: {username: result[0].username, user_email: result[0].user_email},
+        message: "ログイン成功"
+      })
+    } else {
+      console.log("result: ", result)
+      return res.json({ success: 0, message: 'アカンウトかパウワードが間違った！' });
+    }
+  })
+});
+
 app.post('/getGoodsList', (req, res) => {
-  console.log("/api/getGoodsList requested");
-  db.query('SELECT * FROM sp_goods ORDER BY goods_id DESC', (err, results) => {
+  db.query('SELECT * FROM sp_goods ORDER BY goods_id DESC', (err, result) => {
     if (err) return res.status(500).send(err);
-    res.json(results);
+    res.json(result);
   });
 });
 app.post('/addGood', (req, res) => {
-  console.log("/api/addGood requested");
   const { goods_name } = req.body;
   const sql = `INSERT INTO sp_goods (goods_name, add_time, upd_time)
-    VALUES (?, UNIX_TIMESTAMP(NOW()), UNIX_TIMESTAMP(NOW()));`
-  db.query(sql, [goods_name], (err, results) => {
+               VALUES (?, UNIX_TIMESTAMP(NOW()), UNIX_TIMESTAMP(NOW()));`
+  db.query(sql, [goods_name], (err, result) => {
     if (err) return res.status(500).send(err);
-    res.json(results);
+    res.json(result);
   });
 });
 app.post('/updateGood', (req, res) => {
-  console.log("/api/updateGood requested");
   const { goods_name, goods_id} = req.body;
   const sql = `UPDATE sp_goods SET goods_name = ? WHERE goods_id = ?;`
-  db.query(sql, [goods_name, goods_id], (err, results) => {
+  db.query(sql, [goods_name, goods_id], (err, result) => {
     if (err) return res.status(500).send(err);
-    res.json(results);
+    res.json(result);
   });
 });
 app.post('/deleteGood', (req, res) => {
-  console.log("/api/deleteGood requested");
   const { id } = req.body;
-  db.query(`DELETE FROM sp_goods WHERE goods_id = ${id};`, (err, results) => {
+  db.query(`DELETE FROM sp_goods WHERE goods_id = ${id};`, (err, result) => {
     if (err) return res.status(500).send(err);
-    res.json(results);
+    res.json(result);
   });
 });
 

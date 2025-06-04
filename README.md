@@ -1,4 +1,4 @@
-# Reactのテーブルにサポートを提供している、簡単なCRUDができます
+# Reactのショップ管理システムにサポートを提供している、簡単なCRUDができます
 
 # 起動のコマンド
 ## node server.js / npm start
