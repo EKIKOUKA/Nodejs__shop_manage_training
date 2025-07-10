@@ -1,6 +1,7 @@
 const express = require('express');
 const mysql = require('mysql2');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 const speakeasy = require('speakeasy');
 const qrcode = require('qrcode');
 const multer = require('multer');
@@ -124,34 +125,37 @@ app.post('/login', (req, res) => {
             return res.status(500).json({success: 0, message: "データーヘースー調べが失敗した"});
         }
 
-        if (result[0] && result[0].password == password) {
-
-            const Bearer_token = jwt.sign(
-                {userId: result[0].user_id, email: result[0].user_email},
-                SECRET_KEY,
-                {expiresIn: '1d'} // 1s, 1m, 30d, 365d
-            );
-            let userInfo = {
-                userId: result[0].user_id,
-                username: result[0].username,
-                user_email: result[0].user_email,
-                avatar: result[0].avatar
-            }
-            if (result[0].totp_secret) {
-                userInfo.totp_secret = true
-            } else {
-                userInfo.totp_secret = false
-                userInfo.token = Bearer_token
-            }
-            return res.json({
-                success: 1,
-                userInfo,
-                message: "ログイン成功"
-            })
-        } else {
-            console.log("result: ", result)
-            return res.status(400).json({success: 0, message: 'アカンウトかパウワードが間違った！'});
+        const user = result[0];
+        if (!user) {
+            return res.status(400).json({ success: 0, message: "アカウントが存在しません" })
         }
+
+        const passwordMatch = await bcrypt.compare(password, user.password);
+        if (!passwordMatch) {
+            return res.status(400).json({success: 0, message: 'アカンウトかパウワードが間違っています！'});
+        }
+
+        const Bearer_token = jwt.sign(
+            { userId: user.user_id, email: user.user_email },
+            SECRET_KEY,
+            { expiresIn: '1d' } // 1s, 1m, 30d, 365d
+        );
+        let userInfo = {
+            userId: user.user_id,
+            username: user.username,
+            user_email: user.user_email,
+            avatar: user.avatar,
+            totp_secret: !!user.totp_secret
+        }
+        if (!user.totp_secret) {
+            userInfo.token = Bearer_token
+        }
+
+        return res.json({
+            success: 1,
+            userInfo,
+            message: "ログイン成功"
+        })
     })
 });
 
