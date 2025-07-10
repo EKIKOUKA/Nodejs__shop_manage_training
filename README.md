@@ -11,6 +11,8 @@
     <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ログイン認証のためのトークン管理に使用。ユーザーの認証状態を安全に保持するために</p>
     <li>2段階認証（2FA）：speakeasy ＋ qrcode</li>
     <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TOTPベースの2段階認証コード生成とQRコードの表示に使用。</p>
+    <li>パスワードを安全に扱う：Bcrypt</li>
+    <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;パスワードのセキュリティを向上させるための強力なツール</p>
     <li>ファイルアップロード：multer</li>
     <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;マルチパートフォームデータ（例：画像アップロードなど）を処理。</p>
     <li>ファイルシステム操作：fs、path</li>
